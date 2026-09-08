@@ -97,23 +97,32 @@ export default function BigRobotSection() {
       entryT = 0,
       lastT = 0;
     let mx = 0,
-      mxTarget = 0;
+      mxTarget = 0,
+      my = 0,
+      myTarget = 0;
 
     const step = (now: number) => {
       const dt = lastT ? Math.min((now - lastT) / 1000, 0.25) : 0.016;
       lastT = now;
 
-      const before = mx;
+      const beforeX = mx;
+      const beforeY = my;
       mx += (mxTarget - mx) * (1 - Math.exp(-dt / RB.tau));
+      my += (myTarget - my) * (1 - Math.exp(-dt / RB.tau));
       if (Math.abs(mxTarget - mx) < 0.0008) mx = mxTarget;
-      if (rig && mx !== before) {
+      if (Math.abs(myTarget - my) < 0.0008) my = myTarget;
+      if (rig && (mx !== beforeX || my !== beforeY)) {
         const hy = -mx * RB.look;
+        const hx = -my * 0.12 + Math.abs(mx) * RB.lookX;
         if (rig.head) {
           rig.head.rotation.y = hy;
-          rig.head.rotation.x = Math.abs(mx) * RB.lookX;
+          rig.head.rotation.x = hx;
         }
         if (rig.head2) rig.head2.rotation.y = hy * 0.18;
-        if (rig.neck) rig.neck.rotation.y = hy * 0.3;
+        if (rig.neck) {
+          rig.neck.rotation.y = hy * 0.3;
+          rig.neck.rotation.x = hx * 0.3;
+        }
       }
 
       jp += (jpTarget - jp) * (1 - Math.exp(-dt / 0.11));
@@ -123,7 +132,7 @@ export default function BigRobotSection() {
       style.setProperty("--rbIn", entry.toFixed(4));
       renderJourney(jp);
 
-      const settled = jp === jpTarget && entry === entryT && mx === mxTarget;
+      const settled = jp === jpTarget && entry === entryT && mx === mxTarget && my === myTarget;
       if (settled) {
         lastT = 0;
         raf = null;
@@ -150,6 +159,7 @@ export default function BigRobotSection() {
       if (!active) return;
       const r = rbSection.getBoundingClientRect();
       mxTarget = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width - 0.5) * 2));
+      myTarget = Math.max(-1, Math.min(1, (e.clientY / window.innerHeight - 0.5) * 2));
       kick();
     };
 

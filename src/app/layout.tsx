@@ -22,9 +22,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Gireesh — Aesthetic Software Developer",
+  title: "Pudhinraj — AI & Flutter Software Engineer",
   description:
-    "Portfolio of Gireesh — aesthetic software developer building clean code and digital solutions.",
+    "Portfolio of H B Pudhinraj — AI Engineer & Flutter Developer building intelligent mobile apps, Dart SDKs, and scalable SaaS systems.",
   icons: {
     icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%23120806'/%3E%3Ccircle cx='8' cy='8' r='3.4' fill='%23ff5a1f'/%3E%3C/svg%3E",
   },

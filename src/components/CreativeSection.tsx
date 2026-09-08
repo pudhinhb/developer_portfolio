@@ -473,9 +473,8 @@ export default function CreativeSection({ onOpenWorks }: CreativeSectionProps) {
       <div ref={stageRef} className="s2-stage">
         <div ref={compRef} className="s2-comp">
           <p className="s2-brand s2-meta">
-            <span className="s2-brand-my">My</span>
-            <span className="s2-brand-creative">Creative</span>
-            <span className="s2-brand-hunch">Hunch</span>
+            <span className="s2-brand-my">Pudhinraj</span>{" "}
+            <span className="s2-brand-hunch">H B</span>
           </p>
 
           <div className="s2-side s2-side--left s2-meta">
@@ -535,16 +534,16 @@ export default function CreativeSection({ onOpenWorks }: CreativeSectionProps) {
               <span className="s2-label s2-label--ai">AI.</span>
             </li>
             <li className="s2-label-pos s2-pos-sys">
-              <span className="s2-label s2-label--sys">SYSTEMS.</span>
+              <span className="s2-label s2-label--sys">FLUTTER.</span>
             </li>
             <li className="s2-label-pos s2-pos-web">
-              <span className="s2-label s2-label--web">WEB.</span>
+              <span className="s2-label s2-label--web">iOS.</span>
             </li>
             <li className="s2-label-pos s2-pos-api">
-              <span className="s2-label s2-label--api">APIs.</span>
+              <span className="s2-label s2-label--api">ANDROID.</span>
             </li>
             <li className="s2-label-pos s2-pos-auto">
-              <span className="s2-label s2-label--auto">AUTOMATION.</span>
+              <span className="s2-label s2-label--auto">SYSTEMS.</span>
             </li>
           </ul>
         </div>
@@ -577,22 +576,22 @@ export default function CreativeSection({ onOpenWorks }: CreativeSectionProps) {
 
         {/* Section 02 -> 03 Puzzle transition layers */}
         <div className="s3-atmo" aria-hidden="true">
-          <p className="s3-credit s3-credit--l">MyCreativeHunch Studio</p>
-          <p className="s3-credit s3-credit--r">&copy; 2026 MyCreativeHunch</p>
+          <p className="s3-credit s3-credit--l">Pudhinraj H B</p>
+          <p className="s3-credit s3-credit--r">&copy; 2026 Pudhinraj</p>
         </div>
 
         {/* Section 03: About Me */}
         <div ref={aboutRootRef} className="p3" id="section-03">
           <div className="p3-dim" aria-hidden="true">
-            <span>Functional &amp; Beautiful</span>
-            <span>Designs for Startups</span>
+            <span>Intelligent &amp; Scalable</span>
+            <span>Mobile Apps for Startups</span>
             <span className="p3-dim-3">Ready to Scale</span>
           </div>
 
           <p className="p3-corner p3-corner--l">
-            Transforming <b>Visions</b> to Reality
+            Engineering <b>Visions</b> to Reality
           </p>
-          <p className="p3-corner p3-corner--r">www.mycreativehunch.com</p>
+          <p className="p3-corner p3-corner--r">github.com/pudhinhb</p>
 
           <div className="ab-comp">
             <span className="ab-title-mask">
@@ -615,7 +614,7 @@ export default function CreativeSection({ onOpenWorks }: CreativeSectionProps) {
                     <span className="ab-kicker">( Identity )</span>
                     <Image
                       className="ab-img"
-                      src="/assets/hero-portrait.jpg"
+                      src="/assets/hero-portrait.png"
                       alt=""
                       width={400}
                       height={500}
@@ -775,7 +774,7 @@ export default function CreativeSection({ onOpenWorks }: CreativeSectionProps) {
               </div>
               <div className="ab-view-media">
                 <Image
-                  src="/assets/hero-portrait.jpg"
+                  src="/assets/hero-portrait.png"
                   alt={`Portrait of ${heroContent.headline}`}
                   width={600}
                   height={750}

@@ -90,11 +90,12 @@ export default function HeroSection({ onOpenWorks }: HeroSectionProps) {
       if (atmoLayer) atmoLayer.style.transform = "";
     };
 
-    const SETTLE_AT_MS = 6000;
+    enableInteractions();
+
+    const SETTLE_AT_MS = 5000;
     docEl.classList.add("is-ready");
     const timer = window.setTimeout(() => {
       docEl.classList.add("is-settled");
-      enableInteractions();
     }, SETTLE_AT_MS);
 
     return () => {
@@ -142,9 +143,9 @@ export default function HeroSection({ onOpenWorks }: HeroSectionProps) {
           <div className="portrait-stage fx fx-portrait">
             <Image
               className="portrait-img"
-              src="/assets/hero-portrait.jpg"
-              width={1408}
-              height={1117}
+              src="/assets/hero-portrait.png"
+              width={1407}
+              height={1118}
               priority
               alt={`Portrait of ${heroContent.headline}, software developer, lit by warm red cinematic light`}
             />

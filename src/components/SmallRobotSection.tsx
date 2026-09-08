@@ -18,9 +18,10 @@ export default function SmallRobotSection() {
 
     const SR = {
       scene: "/assets/robot.splinecode",
-      turn: 0.44,
-      tilt: 0.07,
-      tau: 0.32,
+      turnX: 0.44, // head yaw left/right
+      turnY: 0.22, // head pitch up/down
+      tilt: 0.05,  // subtle inquisitive roll
+      tau: 0.24,   // damping for natural following
     };
 
     let app: any = null,
@@ -33,7 +34,16 @@ export default function SmallRobotSection() {
       entryT = 0,
       lastT = 0;
     let mx = 0,
-      mxTarget = 0;
+      mxTarget = 0,
+      my = 0,
+      myTarget = 0;
+
+    // The robot's natural forward-facing resting pose in the isometric scene
+    const baseRot = {
+      x: -0.45949,
+      y: -0.80998,
+      z: -0.34412,
+    };
 
     const step = (now: number) => {
       const dt = lastT ? Math.min((now - lastT) / 1000, 0.25) : 0.016;
@@ -44,13 +54,20 @@ export default function SmallRobotSection() {
       style.setProperty("--srIn", entry.toFixed(4));
 
       mx += (mxTarget - mx) * (1 - Math.exp(-dt / SR.tau));
+      my += (myTarget - my) * (1 - Math.exp(-dt / SR.tau));
       if (Math.abs(mxTarget - mx) < 0.0008) mx = mxTarget;
+      if (Math.abs(myTarget - my) < 0.0008) my = myTarget;
+
       if (head) {
-        head.rotation.y = -mx * SR.turn;
-        head.rotation.z = mx * SR.turn * SR.tilt;
+        // Yaw (left/right): cursor left -> look left (higher y), cursor right -> look right (lower y)
+        head.rotation.y = baseRot.y - mx * SR.turnX;
+        // Pitch (up/down): cursor up -> look up (lower x), cursor down -> look down (higher x)
+        head.rotation.x = baseRot.x + my * SR.turnY;
+        // Subtle natural roll
+        head.rotation.z = baseRot.z + mx * SR.tilt;
       }
 
-      if (!active || (entry === entryT && mx === mxTarget)) {
+      if (!active || (entry === entryT && mx === mxTarget && my === myTarget)) {
         lastT = 0;
         raf = null;
         return;
@@ -64,8 +81,12 @@ export default function SmallRobotSection() {
 
     const onPointerMove = (e: PointerEvent) => {
       if (!active) return;
-      const r = srSection.getBoundingClientRect();
-      mxTarget = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width - 0.5) * 2));
+      const rect = canvas.getBoundingClientRect();
+      const cx = rect.left + rect.width * 0.5;
+      const cy = rect.top + rect.height * 0.4;
+      // Calculate normalized direction vector from robot to cursor
+      mxTarget = Math.max(-1, Math.min(1, (e.clientX - cx) / (window.innerWidth * 0.45)));
+      myTarget = Math.max(-1, Math.min(1, (e.clientY - cy) / (window.innerHeight * 0.45)));
       kick();
     };
 
@@ -83,10 +104,18 @@ export default function SmallRobotSection() {
         await app.load(SR.scene);
         if (app.setGlobalEvents) app.setGlobalEvents(false);
         head = app.findObjectByName ? app.findObjectByName("Cabeza") : null;
-        if (head) head.rotation.y = 0;
+        if (head) {
+          // Initialize at true natural resting orientation
+          head.rotation.x = baseRot.x;
+          head.rotation.y = baseRot.y;
+          head.rotation.z = baseRot.z;
+        }
+        if (active && app.play) {
+          app.play();
+        }
         running = true;
         srSection.classList.add("is-robot-ready");
-        (window as any).__rbSmall = { app, head };
+        (window as any).__rbSmall = { app, head, baseRot };
         kick();
       } catch {
         loading = false;
