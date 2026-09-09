@@ -82,11 +82,14 @@ const SelectedWorks = forwardRef<SelectedWorksHandle, {}>((props, ref) => {
         const mainEl = document.querySelector("main");
         if (mainEl) mainEl.setAttribute("aria-hidden", "true");
         scroller.scrollTop = 0;
+        wpRef.current = 0;
+        wpTargetRef.current = 0;
+        activeSlideRef.current = 0;
+        setActiveSlide(0);
         requestAnimationFrame(() => {
           wk.classList.add("is-in");
           if (measureWkRef.current) measureWkRef.current();
           if (applyWkRef.current) applyWkRef.current(0);
-          setActiveSlide(0);
         });
       },
       () => {
@@ -144,6 +147,13 @@ const SelectedWorks = forwardRef<SelectedWorksHandle, {}>((props, ref) => {
     flashTo(() => detail.classList.remove("is-open"));
   };
 
+  const activeSlideRef = useRef<number>(0);
+  const wpRef = useRef<number>(0);
+  const wpTargetRef = useRef<number>(0);
+  const isAnimatingRef = useRef<boolean>(false);
+  const animRafRef = useRef<number | null>(null);
+  const wkRafRef = useRef<number | null>(null);
+
   const prevDetail = () => {
     if (activeProjectIndex === null) return;
     const nextIdx = (activeProjectIndex - 1 + projects.length) % projects.length;
@@ -170,10 +180,7 @@ const SelectedWorks = forwardRef<SelectedWorksHandle, {}>((props, ref) => {
     if (!wk || !scroller || !track) return;
 
     const clampW = (v: number) => Math.min(1, Math.max(0, v));
-    let wp = 0,
-      wpTarget = 0,
-      wkRaf: number | null = null,
-      wkRange = 1;
+    let wkRange = 1;
     let lastIdxShown = "";
 
     const isMobileWk = () => window.innerWidth <= 720;
@@ -197,18 +204,21 @@ const SelectedWorks = forwardRef<SelectedWorksHandle, {}>((props, ref) => {
 
     const applyWk = (p: number) => {
       const a = p * (N - 1);
-      const depth = isMobileWk() ? 520 : 860;
-      const lat = isMobileWk() ? 2.4 : 5.6;
+      const depth = isMobileWk() ? 480 : 820;
+      const lat = isMobileWk() ? 2.2 : 5.4;
       const mobile = isMobileWk();
 
       const currentIdx = Math.min(N - 1, Math.max(0, Math.round(a)));
-      setActiveSlide(currentIdx);
+      if (currentIdx !== activeSlideRef.current) {
+        activeSlideRef.current = currentIdx;
+        setActiveSlide(currentIdx);
+      }
 
       screens.forEach((s, i) => {
         const off = i - a;
 
-        // Decisive cutoff: past slides fly away and hide completely; future slides wait in distance
-        if (off < -0.32 || off > 1.18) {
+        // Smooth visibility cutoff with full fade-to-zero (no pop-in/pop-out)
+        if (off < -0.85 || off > 1.55) {
           s.el.style.visibility = "hidden";
           s.el.style.opacity = "0";
           s.el.style.pointerEvents = "none";
@@ -216,39 +226,39 @@ const SelectedWorks = forwardRef<SelectedWorksHandle, {}>((props, ref) => {
         }
 
         s.el.style.visibility = "visible";
-        s.el.style.pointerEvents = Math.abs(off) <= 0.28 ? "auto" : "none";
+        s.el.style.pointerEvents = Math.abs(off) <= 0.32 ? "auto" : "none";
 
-        // Outward lateral sweep for leaving slides so they NEVER linger under next card or Outro
-        const x = off < 0 ? (s.side || -1) * (lat + 28) * -off : s.side * lat * off;
-        const y = off < 0 ? off * -12 : 0;
+        // Fluid spatial geometry: departing card floats gently out and away
+        const x = off < 0 ? (s.side || -1) * (lat + 14) * -off : s.side * lat * off;
+        const y = off < 0 ? off * -6 : 0;
         const z = -off * depth;
-        const rotY = Math.max(-5, Math.min(5, (s.side || 1) * -3.2 * off));
-        const rotX = Math.max(-2, Math.min(2, off * 1.1));
+        const rotY = Math.max(-6, Math.min(6, (s.side || 1) * -3.2 * off));
+        const rotX = Math.max(-2.2, Math.min(2.2, off * 1.0));
         const scale =
           off < 0
-            ? Math.max(0.78, 1 + off * 0.45)
-            : Math.max(0.85, 1 - off * 0.12);
+            ? Math.max(0.82, 1 + off * 0.24)
+            : Math.max(0.86, 1 - off * 0.12);
 
         s.el.style.transform =
           `translate3d(${x.toFixed(2)}vw, ${y.toFixed(2)}svh, ${z.toFixed(1)}px) ` +
           `scale(${scale.toFixed(3)}) ` +
           `rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg)`;
 
-        // Decisive fade out for past slides so card 5 never bleeds into Outro
+        // Pure smooth opacity that reaches 0 smoothly before visibility cutoff
         const opacity =
-          off < 0 ? Math.max(0, 1 + off * 3.2) : Math.max(0, 1 - off * 1.15);
+          off < 0 ? Math.max(0, 1 + off * 1.6) : Math.max(0, 1 - off * 0.85);
         s.el.style.opacity = opacity.toFixed(3);
 
-        s.el.style.zIndex = String(100 - Math.round(off * 12));
+        s.el.style.zIndex = String(100 - Math.round(off * 10));
         s.el.style.setProperty("--o", off.toFixed(3));
 
         if (!mobile) {
-          const blur = Math.abs(off) > 0.15 ? Math.min(Math.abs(off) * 5, 8) : 0;
+          const blur = Math.abs(off) > 0.2 ? Math.min(Math.abs(off) * 4, 7) : 0;
           s.el.style.filter = blur > 0.2 ? `blur(${blur.toFixed(1)}px)` : "";
         }
       });
 
-      // Update counter to always reflect meaningful project progression
+      // Update counter to reflect current meaningful project index
       let shown = "01";
       if (currentIdx === 0) {
         shown = "01";
@@ -265,33 +275,133 @@ const SelectedWorks = forwardRef<SelectedWorksHandle, {}>((props, ref) => {
     };
     applyWkRef.current = applyWk;
 
-    const wkStep = () => {
-      wp += (wpTarget - wp) * 0.18;
-      if (Math.abs(wpTarget - wp) < 0.0005) wp = wpTarget;
-      applyWk(wp);
-      wkRaf = wp === wpTarget ? null : requestAnimationFrame(wkStep);
-    };
+    // Smooth cubic bezier easing animation for slide transitions
+    const easeCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
+    const animateToSlide = (targetIdx: number) => {
+      const startWp = wpRef.current;
+      const targetWp = clampW(targetIdx / (N - 1));
+      if (Math.abs(targetWp - startWp) < 0.0003) {
+        activeSlideRef.current = targetIdx;
+        setActiveSlide(targetIdx);
+        return;
+      }
+
+      if (animRafRef.current !== null) cancelAnimationFrame(animRafRef.current);
+      if (wkRafRef.current !== null) cancelAnimationFrame(wkRafRef.current);
+
+      isAnimatingRef.current = true;
+      const duration = 480; // 480ms snappy cinematic glide
+      const startTime = performance.now();
+
+      const loop = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const val = startWp + (targetWp - startWp) * easeCubic(progress);
+
+        wpRef.current = val;
+        wpTargetRef.current = val;
+        applyWk(val);
+
+        if (scroller) {
+          scroller.scrollTop = val * wkRange;
+        }
+
+        if (progress < 1) {
+          animRafRef.current = requestAnimationFrame(loop);
+        } else {
+          wpRef.current = targetWp;
+          wpTargetRef.current = targetWp;
+          applyWk(targetWp);
+          animRafRef.current = null;
+          isAnimatingRef.current = false;
+          activeSlideRef.current = targetIdx;
+          setActiveSlide(targetIdx);
+        }
+      };
+      animRafRef.current = requestAnimationFrame(loop);
+    };
+    scrollToSlideRef.current = animateToSlide;
+
+    // Wheel event handler with smart debounce for effortless 1-gesture slide advance
+    let wheelAccum = 0;
+    let lastWheelTime = 0;
+    const onWkWheel = (e: WheelEvent) => {
+      if (detailRef.current && detailRef.current.classList.contains("is-open")) return;
+      e.preventDefault();
+
+      if (isAnimatingRef.current) return;
+
+      const now = performance.now();
+      if (now - lastWheelTime > 280) {
+        wheelAccum = 0;
+      }
+      lastWheelTime = now;
+
+      wheelAccum += e.deltaY;
+      if (Math.abs(wheelAccum) >= 28) {
+        const dir = wheelAccum > 0 ? 1 : -1;
+        wheelAccum = 0;
+        const cur = activeSlideRef.current;
+        const target = Math.min(N - 1, Math.max(0, cur + dir));
+        if (target !== cur) {
+          animateToSlide(target);
+        }
+      }
+    };
+    wk.addEventListener("wheel", onWkWheel, { passive: false });
+
+    // Touch swipe support for smooth mobile swiping
+    let touchStartY = 0;
+    let touchStartX = 0;
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+      }
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (detailRef.current && detailRef.current.classList.contains("is-open")) return;
+      if (isAnimatingRef.current) return;
+      if (e.changedTouches.length === 1) {
+        const dy = touchStartY - e.changedTouches[0].clientY;
+        const dx = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(dy) > 36 || Math.abs(dx) > 36) {
+          const delta = Math.abs(dy) > Math.abs(dx) ? dy : dx;
+          const cur = activeSlideRef.current;
+          if (delta > 0) {
+            animateToSlide(Math.min(N - 1, cur + 1));
+          } else {
+            animateToSlide(Math.max(0, cur - 1));
+          }
+        }
+      }
+    };
+    wk.addEventListener("touchstart", onTouchStart, { passive: true });
+    wk.addEventListener("touchend", onTouchEnd, { passive: true });
+
+    // Fallback scroll listener (if user drags scrollbar directly)
+    let scrollSnapTimer: NodeJS.Timeout | null = null;
     const onWkScroll = () => {
-      wpTarget = clampW(scroller.scrollTop / wkRange);
-      if (wkRaf === null) wkRaf = requestAnimationFrame(wkStep);
-    };
+      if (isAnimatingRef.current || animRafRef.current !== null) return;
+      wpTargetRef.current = clampW(scroller.scrollTop / wkRange);
+      wpRef.current += (wpTargetRef.current - wpRef.current) * 0.28;
+      applyWk(wpRef.current);
 
-    const scrollToSlide = (idx: number) => {
-      const targetP = clampW(idx / (N - 1));
-      const targetScroll = targetP * wkRange;
-      scroller.scrollTo({
-        top: targetScroll,
-        behavior: "smooth",
-      });
+      if (scrollSnapTimer) clearTimeout(scrollSnapTimer);
+      scrollSnapTimer = setTimeout(() => {
+        if (!isAnimatingRef.current) {
+          const nearestSlide = Math.min(N - 1, Math.max(0, Math.round(wpRef.current * (N - 1))));
+          animateToSlide(nearestSlide);
+        }
+      }, 160);
     };
-    scrollToSlideRef.current = scrollToSlide;
-
     scroller.addEventListener("scroll", onWkScroll, { passive: true });
+
     const handleResize = () => {
       if (document.documentElement.classList.contains("works-open")) {
         measureWk();
-        applyWk(wp);
+        applyWk(wpRef.current);
       }
     };
     window.addEventListener("resize", handleResize);
@@ -320,26 +430,31 @@ const SelectedWorks = forwardRef<SelectedWorksHandle, {}>((props, ref) => {
         return;
       }
 
-      // If viewing carousel, allow arrow keys to navigate slides smoothly
+      // If viewing carousel, allow arrow keys to smoothly glide between slides
       if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === "PageDown") {
         e.preventDefault();
-        const next = Math.min(N - 1, activeSlide + 1);
-        scrollToSlide(next);
+        const next = Math.min(N - 1, activeSlideRef.current + 1);
+        animateToSlide(next);
       } else if (e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "PageUp") {
         e.preventDefault();
-        const prev = Math.max(0, activeSlide - 1);
-        scrollToSlide(prev);
+        const prev = Math.max(0, activeSlideRef.current - 1);
+        animateToSlide(prev);
       }
     };
     document.addEventListener("keydown", handleKeydown);
 
     return () => {
+      wk.removeEventListener("wheel", onWkWheel);
+      wk.removeEventListener("touchstart", onTouchStart);
+      wk.removeEventListener("touchend", onTouchEnd);
       scroller.removeEventListener("scroll", onWkScroll);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("keydown", handleKeydown);
-      if (wkRaf !== null) cancelAnimationFrame(wkRaf);
+      if (wkRafRef.current !== null) cancelAnimationFrame(wkRafRef.current);
+      if (animRafRef.current !== null) cancelAnimationFrame(animRafRef.current);
+      if (scrollSnapTimer) clearTimeout(scrollSnapTimer);
     };
-  }, [projects.length, N, activeSlide]);
+  }, [projects.length, N]);
 
   return (
     <>
@@ -516,20 +631,36 @@ const SelectedWorks = forwardRef<SelectedWorksHandle, {}>((props, ref) => {
                       Ready to architect intelligent, high-performance mobile systems for
                       your team.
                     </p>
-                    <button className="wk-return" type="button" onClick={exit}>
-                      <svg
-                        viewBox="0 0 18 12"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden="true"
+                    <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginTop: "3.5svh" }}>
+                      <a
+                        href="#contact"
+                        className="wk-return"
+                        style={{
+                          textDecoration: "none",
+                          background: "#e8281e",
+                          borderColor: "#e8281e",
+                          color: "#fff",
+                          boxShadow: "0 6px 20px rgba(232, 40, 30, 0.4)",
+                        }}
+                        onClick={() => exit()}
                       >
-                        <path d="M1 6h15M11 1l5 5-5 5" />
-                      </svg>{" "}
-                      Back to About
-                    </button>
+                        Get In Touch &rarr;
+                      </a>
+                      <button className="wk-return" type="button" onClick={exit}>
+                        <svg
+                          viewBox="0 0 18 12"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M1 6h15M11 1l5 5-5 5" />
+                        </svg>{" "}
+                        Back to About
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

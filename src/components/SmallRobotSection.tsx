@@ -100,9 +100,93 @@ export default function SmallRobotSection() {
         const { Application } = await importCdn(
           "https://cdn.spline.design/@splinetool/runtime@2.0.13/build/runtime.js"
         );
+
+        // Strip watermark from WebGL rendering pipeline
+        const origCreateRenderer = Application.prototype._createRenderer;
+        if (origCreateRenderer) {
+          Application.prototype._createRenderer = async function (...args: any[]) {
+            if (this._data?.shared?.images) {
+              for (const k of Object.keys(this._data.shared.images)) {
+                if (/watermark|spline/i.test(k)) {
+                  delete this._data.shared.images[k];
+                }
+              }
+            }
+            const renderer = await origCreateRenderer.apply(this, args);
+            if (renderer?.pipeline) {
+              renderer.pipeline.setWatermark = function () {
+                this.watermarkTexture = null;
+                this._effectChainDirty = true;
+              };
+              renderer.pipeline.watermarkTexture = null;
+              renderer.pipeline._chainWatermark = null;
+              renderer.pipeline._effectChainDirty = true;
+              if (renderer.pipeline.disableUIOverlay) {
+                renderer.pipeline.disableUIOverlay();
+              }
+            }
+            return renderer;
+          };
+        }
+
         app = new Application(canvas);
+
+        let splineData: any = undefined;
+        Object.defineProperty(app, "_data", {
+          get() {
+            return splineData;
+          },
+          set(val) {
+            if (val?.shared?.images) {
+              for (const k of Object.keys(val.shared.images)) {
+                if (/watermark|spline/i.test(k)) {
+                  delete val.shared.images[k];
+                }
+              }
+            }
+            splineData = val;
+          },
+          configurable: true,
+          enumerable: true,
+        });
+
         await app.load(SR.scene);
         if (app.setGlobalEvents) app.setGlobalEvents(false);
+
+        // Ensure pipeline watermark texture is stripped and not drawn
+        if (app._renderer?.pipeline) {
+          app._renderer.pipeline.setWatermark = function () {};
+          app._renderer.pipeline.watermarkTexture = null;
+          app._renderer.pipeline._chainWatermark = null;
+          app._renderer.pipeline._effectChainDirty = true;
+          if (app._renderer.pipeline.disableUIOverlay) {
+            app._renderer.pipeline.disableUIOverlay();
+          }
+        }
+        if (app._scene?.traverse) {
+          app._scene.traverse((obj: any) => {
+            if (obj.name && /watermark|spline/i.test(obj.name)) {
+              obj.visible = false;
+              if (obj.parent) obj.parent.remove(obj);
+            }
+          });
+        }
+        if (app.requestRender) app.requestRender();
+
+        // Immediately purge any injected Spline logo / watermark badge
+        const purgeSplineBadge = () => {
+          document
+            .querySelectorAll(
+              '[data-spline-html-content], iframe[title*="Spline" i], #spline-watermark, .spline-watermark, a[href*="spline.design"], a[href*="spline"]'
+            )
+            .forEach((el) => el.remove());
+        };
+        purgeSplineBadge();
+        if (canvas.parentElement) {
+          const obs = new MutationObserver(() => purgeSplineBadge());
+          obs.observe(canvas.parentElement, { childList: true, subtree: true });
+        }
+
         head = app.findObjectByName ? app.findObjectByName("Cabeza") : null;
         if (head) {
           // Initialize at true natural resting orientation

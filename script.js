@@ -206,13 +206,30 @@
     });
   }
 
-  /* ---- 04b · Theme button — refined feedback pulse ---- */
-  const themeBtn = document.querySelector(".theme-btn");
-  if (themeBtn) {
-    themeBtn.addEventListener("click", () => {
-      themeBtn.classList.remove("is-pulse");
-      void themeBtn.offsetWidth; // restart the pulse animation
-      themeBtn.classList.add("is-pulse");
+  /* ---- 04b · Resume Modal Viewer & Downloader ---- */
+  const resumeBtn = document.querySelector(".resume-btn, .theme-btn");
+  const resumeModal = document.querySelector(".resume-modal-backdrop");
+  const resumeClose = document.querySelector(".resume-modal-close");
+
+  if (resumeBtn && resumeModal) {
+    const openResume = () => {
+      resumeModal.style.display = "flex";
+      document.body.style.overflow = "hidden";
+    };
+    const closeResume = () => {
+      resumeModal.style.display = "none";
+      document.body.style.overflow = "";
+    };
+
+    resumeBtn.addEventListener("click", openResume);
+    if (resumeClose) resumeClose.addEventListener("click", closeResume);
+    resumeModal.addEventListener("click", (e) => {
+      if (e.target === resumeModal) closeResume();
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && resumeModal.style.display === "flex") {
+        closeResume();
+      }
     });
   }
 
@@ -716,11 +733,15 @@
       const glass = document.createElement("article");
       glass.className = "wk-glass";
       if (p.accent) glass.style.setProperty("--wa", p.accent);
+      const tagsHtml = (Array.isArray(p.techStack) && p.techStack.length)
+        ? '<div class="wk-tags">' + p.techStack.slice(0, 4).map(t => `<span class="wk-tag">${t}</span>`).join('') + '</div>'
+        : '';
       glass.innerHTML =
         '<div class="wk-copy">' +
         `<p class="wk-num">${pad2(i + 1)} / ${pad2(projects.length)}</p>` +
         `<h3 class="wk-name">${p.name || p.key}</h3>` +
         `<p class="wk-titleline">${p.title || ""}</p>` +
+        tagsHtml +
         `<p class="wk-meta"><i></i>${p.cat || ""} &middot; ${p.year || ""}</p>` +
         `<button class="wk-view" type="button">View Project ${ARROW}</button>` +
         "</div>" +
@@ -1104,10 +1125,90 @@
       loading = true;
       import(RB.runtime)
         .then(({ Application }) => {
+          const origCreateRenderer = Application.prototype._createRenderer;
+          if (origCreateRenderer) {
+            Application.prototype._createRenderer = async function (...args) {
+              if (this._data?.shared?.images) {
+                for (const k of Object.keys(this._data.shared.images)) {
+                  if (/watermark|spline/i.test(k)) {
+                    delete this._data.shared.images[k];
+                  }
+                }
+              }
+              const renderer = await origCreateRenderer.apply(this, args);
+              if (renderer?.pipeline) {
+                renderer.pipeline.setWatermark = function () {
+                  this.watermarkTexture = null;
+                  this._effectChainDirty = true;
+                };
+                renderer.pipeline.watermarkTexture = null;
+                renderer.pipeline._chainWatermark = null;
+                renderer.pipeline._effectChainDirty = true;
+                if (renderer.pipeline.disableUIOverlay) {
+                  renderer.pipeline.disableUIOverlay();
+                }
+              }
+              return renderer;
+            };
+          }
+
           app = new Application(canvas);
+
+          let splineData = undefined;
+          Object.defineProperty(app, "_data", {
+            get() {
+              return splineData;
+            },
+            set(val) {
+              if (val?.shared?.images) {
+                for (const k of Object.keys(val.shared.images)) {
+                  if (/watermark|spline/i.test(k)) {
+                    delete val.shared.images[k];
+                  }
+                }
+              }
+              splineData = val;
+            },
+            configurable: true,
+            enumerable: true,
+          });
+
           return app.load(RB.scene);
         })
         .then(() => {
+          if (app._renderer?.pipeline) {
+            app._renderer.pipeline.setWatermark = function () {};
+            app._renderer.pipeline.watermarkTexture = null;
+            app._renderer.pipeline._chainWatermark = null;
+            app._renderer.pipeline._effectChainDirty = true;
+            if (app._renderer.pipeline.disableUIOverlay) {
+              app._renderer.pipeline.disableUIOverlay();
+            }
+          }
+          if (app._scene?.traverse) {
+            app._scene.traverse((obj) => {
+              if (obj.name && /watermark|spline/i.test(obj.name)) {
+                obj.visible = false;
+                if (obj.parent) obj.parent.remove(obj);
+              }
+            });
+          }
+          if (app.requestRender) app.requestRender();
+
+          // Immediately purge any injected Spline logo / watermark badge
+          const purgeSplineBadge = () => {
+            document
+              .querySelectorAll(
+                '[data-spline-html-content], iframe[title*="Spline" i], #spline-watermark, .spline-watermark, a[href*="spline.design"], a[href*="spline"]'
+              )
+              .forEach((el) => el.remove());
+          };
+          purgeSplineBadge();
+          if (canvas.parentElement) {
+            const obs = new MutationObserver(() => purgeSplineBadge());
+            obs.observe(canvas.parentElement, { childList: true, subtree: true });
+          }
+
           // take the rig over so the look reads clearly, keeping the rest
           // (lighting, materials, composition, scale) exactly as supplied
           if (app.setGlobalEvents) app.setGlobalEvents(false);
@@ -1219,10 +1320,90 @@
       loading = true;
       import(SR.runtime)
         .then(({ Application }) => {
+          const origCreateRenderer = Application.prototype._createRenderer;
+          if (origCreateRenderer) {
+            Application.prototype._createRenderer = async function (...args) {
+              if (this._data?.shared?.images) {
+                for (const k of Object.keys(this._data.shared.images)) {
+                  if (/watermark|spline/i.test(k)) {
+                    delete this._data.shared.images[k];
+                  }
+                }
+              }
+              const renderer = await origCreateRenderer.apply(this, args);
+              if (renderer?.pipeline) {
+                renderer.pipeline.setWatermark = function () {
+                  this.watermarkTexture = null;
+                  this._effectChainDirty = true;
+                };
+                renderer.pipeline.watermarkTexture = null;
+                renderer.pipeline._chainWatermark = null;
+                renderer.pipeline._effectChainDirty = true;
+                if (renderer.pipeline.disableUIOverlay) {
+                  renderer.pipeline.disableUIOverlay();
+                }
+              }
+              return renderer;
+            };
+          }
+
           app = new Application(canvas);
+
+          let splineData = undefined;
+          Object.defineProperty(app, "_data", {
+            get() {
+              return splineData;
+            },
+            set(val) {
+              if (val?.shared?.images) {
+                for (const k of Object.keys(val.shared.images)) {
+                  if (/watermark|spline/i.test(k)) {
+                    delete val.shared.images[k];
+                  }
+                }
+              }
+              splineData = val;
+            },
+            configurable: true,
+            enumerable: true,
+          });
+
           return app.load(SR.scene);
         })
         .then(() => {
+          if (app._renderer?.pipeline) {
+            app._renderer.pipeline.setWatermark = function () {};
+            app._renderer.pipeline.watermarkTexture = null;
+            app._renderer.pipeline._chainWatermark = null;
+            app._renderer.pipeline._effectChainDirty = true;
+            if (app._renderer.pipeline.disableUIOverlay) {
+              app._renderer.pipeline.disableUIOverlay();
+            }
+          }
+          if (app._scene?.traverse) {
+            app._scene.traverse((obj) => {
+              if (obj.name && /watermark|spline/i.test(obj.name)) {
+                obj.visible = false;
+                if (obj.parent) obj.parent.remove(obj);
+              }
+            });
+          }
+          if (app.requestRender) app.requestRender();
+
+          // Immediately purge any injected Spline logo / watermark badge
+          const purgeSplineBadge = () => {
+            document
+              .querySelectorAll(
+                '[data-spline-html-content], iframe[title*="Spline" i], #spline-watermark, .spline-watermark, a[href*="spline.design"], a[href*="spline"]'
+              )
+              .forEach((el) => el.remove());
+          };
+          purgeSplineBadge();
+          if (canvas.parentElement) {
+            const obs = new MutationObserver(() => purgeSplineBadge());
+            obs.observe(canvas.parentElement, { childList: true, subtree: true });
+          }
+
           // the supplied scene follows the cursor through a `lookAt` event:
           // switch its document listeners off so the head is ours alone.
           if (app.setGlobalEvents) app.setGlobalEvents(false);

@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="abg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c0714" />
+      <stop offset="50%" stop-color="#140a24" />
+      <stop offset="100%" stop-color="#07030c" />
+    </linearGradient>
+    <linearGradient id="purpleGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#9b59b6" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#8e44ad" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="purpleCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#211036" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#11071c" stop-opacity="0.98" />
+    </linearGradient>
+    <linearGradient id="purpleAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#9b59b6" />
+      <stop offset="100%" stop-color="#e056fd" />
+    </linearGradient>
+    <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00e676" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#00e676" stop-opacity="0" />
+    </linearGradient>
+    <filter id="ashadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="24" stdDeviation="30" flood-color="#000000" flood-opacity="0.85" />
+      <feDropShadow dx="0" dy="0" stdDeviation="24" flood-color="#9b59b6" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1200" height="800" fill="url(#abg)" />
+  <circle cx="600" cy="400" r="340" fill="url(#purpleGlow)" filter="blur(60px)" />
+
+  <!-- Background grid lines -->
+  <g stroke="#26153a" stroke-width="1" opacity="0.4">
+    <line x1="120" y1="0" x2="120" y2="800" />
+    <line x1="320" y1="0" x2="320" y2="800" />
+    <line x1="880" y1="0" x2="880" y2="800" />
+    <line x1="1080" y1="0" x2="1080" y2="800" />
+    <line x1="0" y1="200" x2="1200" y2="200" />
+    <line x1="0" y1="400" x2="1200" y2="400" />
+    <line x1="0" y1="600" x2="1200" y2="600" />
+  </g>
+
+  <!-- Left Stats & Info Box -->
+  <g transform="translate(110, 180)">
+    <rect width="260" height="96" rx="16" fill="#150b24" stroke="#2e184d" stroke-width="1.5" />
+    <text x="24" y="38" fill="#c084fc" font-family="Inter, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">CLIENT SCOPE</text>
+    <text x="24" y="72" fill="#ffffff" font-family="Anton, sans-serif" font-size="28">ZIMBABWE (INTL)</text>
+
+    <rect y="120" width="260" height="96" rx="16" fill="#150b24" stroke="#2e184d" stroke-width="1.5" />
+    <text x="24" y="158" fill="#00e676" font-family="Inter, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">PLATFORM TARGETS</text>
+    <text x="24" y="192" fill="#ffffff" font-family="Anton, sans-serif" font-size="28">iOS &amp; ANDROID</text>
+
+    <rect y="240" width="260" height="96" rx="16" fill="#150b24" stroke="#2e184d" stroke-width="1.5" />
+    <text x="24" y="278" fill="#e056fd" font-family="Inter, sans-serif" font-size="13" font-weight="700" letter-spacing="1.5">DATA FREQUENCY</text>
+    <text x="24" y="312" fill="#ffffff" font-family="Anton, sans-serif" font-size="28">REAL-TIME TICKS</text>
+  </g>
+
+  <!-- Center Mobile Phone Mockup -->
+  <g transform="translate(420, 60)" filter="url(#ashadow)">
+    <!-- Phone Outer Body -->
+    <rect width="360" height="680" rx="44" fill="#0c0714" stroke="#371a5c" stroke-width="3" />
+    <!-- Screen Inner Area -->
+    <rect x="10" y="10" width="340" height="660" rx="36" fill="#0f091a" />
+
+    <!-- Notch / Dynamic Island -->
+    <rect x="125" y="22" width="110" height="26" rx="13" fill="#05020a" />
+    <circle cx="215" cy="35" r="4.5" fill="#1c0f2e" />
+
+    <!-- Status Bar Icons -->
+    <text x="36" y="39" fill="#a855f7" font-family="Inter, sans-serif" font-size="11" font-weight="600">9:41</text>
+    <g transform="translate(285, 30)" fill="#a855f7">
+      <path d="M0 8h2v2H0zM3 6h2v4H3zM6 4h2v6H6zM9 1h2v9H9z" />
+    </g>
+
+    <!-- App Header -->
+    <g transform="translate(24, 70)">
+      <rect width="32" height="32" rx="8" fill="url(#purpleAccent)" />
+      <path d="M10 22l6-8 5 4 7-9" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+      <text x="44" y="22" fill="#ffffff" font-family="Inter, sans-serif" font-size="17" font-weight="800" letter-spacing="0.5">Amaramba</text>
+      <text x="238" y="21" fill="#00e676" font-family="Inter, sans-serif" font-size="11" font-weight="700">● LIVE ZSE</text>
+    </g>
+
+    <!-- Portfolio Balance Card -->
+    <g transform="translate(20, 120)">
+      <rect width="300" height="100" rx="18" fill="url(#purpleCard)" stroke="#3b1d63" stroke-width="1.5" />
+      <text x="20" y="32" fill="#a855f7" font-family="Inter, sans-serif" font-size="11" font-weight="700" letter-spacing="1">PORTFOLIO VALUATION</text>
+      <text x="20" y="68" fill="#ffffff" font-family="Anton, sans-serif" font-size="32">$48,920.50</text>
+      <rect x="210" y="44" width="74" height="26" rx="13" fill="#052e16" stroke="#16a34a" stroke-width="1" />
+      <text x="247" y="61" text-anchor="middle" fill="#00e676" font-family="Inter, sans-serif" font-size="11" font-weight="700">+14.2%</text>
+    </g>
+
+    <!-- Real-Time Candlestick Chart Card -->
+    <g transform="translate(20, 235)">
+      <rect width="300" height="230" rx="20" fill="#140b24" stroke="#2d174a" stroke-width="1.5" />
+      <text x="18" y="28" fill="#f3e8ff" font-family="Inter, sans-serif" font-size="13" font-weight="700">ZSE All Share Index (Real-Time)</text>
+      <text x="18" y="46" fill="#a855f7" font-family="Inter, sans-serif" font-size="10">Interval: 1m · Volume: $1.2M</text>
+
+      <!-- Chart grid lines -->
+      <line x1="18" y1="70" x2="282" y2="70" stroke="#25123d" stroke-dasharray="3,3" />
+      <line x1="18" y1="120" x2="282" y2="120" stroke="#25123d" stroke-dasharray="3,3" />
+      <line x1="18" y1="170" x2="282" y2="170" stroke="#25123d" stroke-dasharray="3,3" />
+
+      <!-- Candlesticks -->
+      <!-- Green candle 1 -->
+      <line x1="45" y1="90" x2="45" y2="150" stroke="#00e676" stroke-width="1.5" />
+      <rect x="39" y="105" width="12" height="35" rx="2" fill="#00e676" />
+
+      <!-- Red candle 2 -->
+      <line x1="85" y1="100" x2="85" y2="165" stroke="#ef4444" stroke-width="1.5" />
+      <rect x="79" y="115" width="12" height="40" rx="2" fill="#ef4444" />
+
+      <!-- Green candle 3 -->
+      <line x1="125" y1="80" x2="125" y2="140" stroke="#00e676" stroke-width="1.5" />
+      <rect x="119" y="90" width="12" height="38" rx="2" fill="#00e676" />
+
+      <!-- Green candle 4 -->
+      <line x1="165" y1="75" x2="165" y2="130" stroke="#00e676" stroke-width="1.5" />
+      <rect x="159" y="80" width="12" height="32" rx="2" fill="#00e676" />
+
+      <!-- Red candle 5 -->
+      <line x1="205" y1="70" x2="205" y2="125" stroke="#ef4444" stroke-width="1.5" />
+      <rect x="199" y="75" width="12" height="28" rx="2" fill="#ef4444" />
+
+      <!-- Green candle 6 (breakout) -->
+      <line x1="245" y1="55" x2="245" y2="115" stroke="#00e676" stroke-width="2" />
+      <rect x="239" y="60" width="12" height="42" rx="2" fill="#00e676" />
+
+      <!-- Glowing Trendline -->
+      <path d="M45 125 Q 100 135, 145 95 T 245 65" fill="none" stroke="#e056fd" stroke-width="2.5" />
+
+      <!-- Chart Bottom Time Labels -->
+      <text x="45" y="210" text-anchor="middle" fill="#6b21a8" font-family="Inter, sans-serif" font-size="9">10:00</text>
+      <text x="125" y="210" text-anchor="middle" fill="#6b21a8" font-family="Inter, sans-serif" font-size="9">12:00</text>
+      <text x="205" y="210" text-anchor="middle" fill="#6b21a8" font-family="Inter, sans-serif" font-size="9">14:00</text>
+      <text x="260" y="210" text-anchor="middle" fill="#00e676" font-family="Inter, sans-serif" font-size="9">NOW</text>
+    </g>
+
+    <!-- Buy & Sell Trading Action Area -->
+    <g transform="translate(20, 480)">
+      <rect width="142" height="46" rx="14" fill="#052e16" stroke="#16a34a" stroke-width="1.5" />
+      <text x="71" y="28" text-anchor="middle" fill="#00e676" font-family="Inter, sans-serif" font-size="14" font-weight="700">BUY ORDER</text>
+
+      <rect x="158" y="0" width="142" height="46" rx="14" fill="#3b0712" stroke="#dc2626" stroke-width="1.5" />
+      <text x="229" y="28" text-anchor="middle" fill="#f87171" font-family="Inter, sans-serif" font-size="14" font-weight="700">SELL ORDER</text>
+    </g>
+
+    <!-- Security Compliance Pill -->
+    <g transform="translate(20, 542)">
+      <rect width="300" height="98" rx="16" fill="#120921" stroke="#25123d" stroke-width="1" />
+      <text x="16" y="26" fill="#9333ea" font-family="Inter, sans-serif" font-size="11" font-weight="700" letter-spacing="1">SECURITY &amp; COMPLIANCE</text>
+      <text x="16" y="52" fill="#f5f3ff" font-family="Inter, sans-serif" font-size="12" font-weight="600">✓ Biometric Authentication Guard</text>
+      <text x="16" y="74" fill="#a855f7" font-family="Inter, sans-serif" font-size="11">End-to-End WebSocket Payloads</text>
+    </g>
+  </g>
+
+  <!-- Right Highlights Box -->
+  <g transform="translate(830, 220)">
+    <text x="0" y="0" fill="#9b59b6" font-family="Inter, sans-serif" font-size="12" font-weight="700" letter-spacing="2">INTERNATIONAL FINTECH</text>
+    <text x="0" y="32" fill="#ffffff" font-family="Anton, sans-serif" font-size="34">STOCK MARKET APP</text>
+    <text x="0" y="66" fill="#c084fc" font-family="Inter, sans-serif" font-size="14" font-weight="400">
+      <tspan x="0" dy="0">High-velocity mobile trading platform</tspan>
+      <tspan x="0" dy="24">with real-time financial market streams</tspan>
+      <tspan x="0" dy="24">engineered for an international client.</tspan>
+    </text>
+
+    <g transform="translate(0, 130)">
+      <rect width="260" height="42" rx="10" fill="#160a28" stroke="#7e22ce" stroke-width="1" />
+      <text x="16" y="26" fill="#e9d5ff" font-family="Inter, sans-serif" font-size="12" font-weight="600">✦ Candlestick Technical Charts</text>
+    </g>
+    <g transform="translate(0, 184)">
+      <rect width="260" height="42" rx="10" fill="#160a28" stroke="#7e22ce" stroke-width="1" />
+      <text x="16" y="26" fill="#e9d5ff" font-family="Inter, sans-serif" font-size="12" font-weight="600">✦ Live Low-Latency Ticker</text>
+    </g>
+    <g transform="translate(0, 238)">
+      <rect width="260" height="42" rx="10" fill="#160a28" stroke="#7e22ce" stroke-width="1" />
+      <text x="16" y="26" fill="#e9d5ff" font-family="Inter, sans-serif" font-size="12" font-weight="600">✦ iOS &amp; Android App Stores</text>
+    </g>
+  </g>
+</svg>
