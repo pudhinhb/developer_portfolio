@@ -96,7 +96,7 @@ const heroContent = {
         stats: { label: "Comms Latency", value: "< 80ms Sockets" },
         links: [
           { label: "View Architecture", url: "https://github.com/pudhinhb", primary: true },
-          { label: "LinkedIn Post", url: "https://linkedin.com/in/pudhinraj-h-b" },
+          { label: "LinkedIn Post", url: "https://www.linkedin.com/in/pudhinraj-h-b-2116a626a?utm_source=share_via&utm_content=profile&utm_medium=member_android" },
         ],
       },
       {
@@ -177,7 +177,7 @@ const heroContent = {
         stats: { label: "Client Scope", value: "International (Zimbabwe)" },
         links: [
           { label: "Case Study Overview", url: "https://github.com/pudhinhb", primary: true },
-          { label: "LinkedIn Connect", url: "https://linkedin.com/in/pudhinraj-h-b" },
+          { label: "LinkedIn Connect", url: "https://www.linkedin.com/in/pudhinraj-h-b-2116a626a?utm_source=share_via&utm_content=profile&utm_medium=member_android" },
         ],
       },
     ],
@@ -288,7 +288,7 @@ const heroContent = {
         title: "Connect",
         items: [
           { label: "GitHub", href: "https://github.com/pudhinhb" },
-          { label: "LinkedIn", href: "https://linkedin.com/in/pudhinraj-h-b" },
+          { label: "LinkedIn", href: "https://www.linkedin.com/in/pudhinraj-h-b-2116a626a?utm_source=share_via&utm_content=profile&utm_medium=member_android" },
           { label: "pub.dev Package", href: "https://pub.dev/packages/temp_mail_blocker" },
           { label: "Coimbatore, Tamil Nadu", href: "#contact" },
         ],
@@ -296,7 +296,7 @@ const heroContent = {
     ],
     social: [
       { label: "GitHub", href: "https://github.com/pudhinhb" },
-      { label: "LinkedIn", href: "https://linkedin.com/in/pudhinraj-h-b" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/pudhinraj-h-b-2116a626a?utm_source=share_via&utm_content=profile&utm_medium=member_android" },
       { label: "pub.dev", href: "https://pub.dev/packages/temp_mail_blocker" },
     ],
     legal: "© 2026 H B Pudhinraj",
