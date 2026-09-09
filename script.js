@@ -1630,8 +1630,30 @@
     setSlot("ft-top", copy.backToTop);
 
     if (mail) {
-      if (copy.email) mail.setAttribute("href", `mailto:${copy.email}`);
-      else mail.remove();
+      if (copy.email) {
+        const mailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+          copy.email
+        )}&su=${encodeURIComponent("Project Inquiry — Let's connect")}`;
+        mail.setAttribute("href", mailUrl);
+        mail.setAttribute("target", "_blank");
+        mail.setAttribute("rel", "noopener noreferrer");
+        mail.setAttribute("title", "Click to compose in Gmail or copy address");
+
+        mail.addEventListener("click", (e) => {
+          if (navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(copy.email);
+          }
+          const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+          if (isMobile) {
+            e.preventDefault();
+            window.location.href = `mailto:${copy.email}?subject=${encodeURIComponent(
+              "Project Inquiry — Let's connect"
+            )}`;
+          }
+        });
+      } else {
+        mail.remove();
+      }
     }
 
     /* link columns (+ an "Elsewhere" column only if social links exist) */

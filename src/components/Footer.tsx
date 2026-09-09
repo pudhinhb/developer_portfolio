@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { heroContent, FooterColumn } from "@/data/content";
 
 interface FooterProps {
@@ -83,6 +83,33 @@ export default function Footer({ onOpenWorks }: FooterProps) {
     groups.push({ title: "Elsewhere", items: copy.social });
   }
 
+  const [copied, setCopied] = useState(false);
+
+  const handleEmailClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const email = copy.email;
+    if (!email) return;
+
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(email)
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 3000);
+        })
+        .catch(() => {});
+    }
+
+    const isMobile =
+      typeof navigator !== "undefined" &&
+      /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      e.preventDefault();
+      window.location.href = `mailto:${email}?subject=${encodeURIComponent(
+        "Project Inquiry — Let's connect"
+      )}`;
+    }
+  };
+
   return (
     <footer ref={footerRef} className="ft" id="contact">
       <div className="ft-env" aria-hidden="true">
@@ -112,30 +139,43 @@ export default function Footer({ onOpenWorks }: FooterProps) {
         </p>
 
         {copy.email && (
-          <a
-            className="ft-mail"
-            data-slot-href="ft-mail"
-            href={`mailto:${copy.email}`}
-          >
-            <span className="ft-mail-label" data-slot="ft-mail-label">
-              {copy.emailLabel}
-            </span>
-            <span className="ft-mail-address" data-slot="ft-mail-address">
-              {copy.email}
-            </span>
-            <svg
-              className="ft-mail-arrow"
-              viewBox="0 0 18 12"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+          <div className="ft-mail-wrapper">
+            <a
+              className="ft-mail"
+              data-slot-href="ft-mail"
+              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+                copy.email
+              )}&su=${encodeURIComponent("Project Inquiry — Let's connect")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleEmailClick}
+              title="Click to compose in Gmail or copy address"
             >
-              <path d="M1 6h15M11 1l5 5-5 5" />
-            </svg>
-          </a>
+              <span className="ft-mail-label" data-slot="ft-mail-label">
+                {copy.emailLabel}
+              </span>
+              <span className="ft-mail-address" data-slot="ft-mail-address">
+                {copy.email}
+              </span>
+              <svg
+                className="ft-mail-arrow"
+                viewBox="0 0 18 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M1 6h15M11 1l5 5-5 5" />
+              </svg>
+            </a>
+            {copied && (
+              <span className="ft-mail-copied-badge" role="status">
+                ✓ Copied to clipboard & opening Gmail!
+              </span>
+            )}
+          </div>
         )}
 
         <nav className="ft-cols" data-slot="ft-cols" aria-label="Footer">

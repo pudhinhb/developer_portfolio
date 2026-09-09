@@ -3583,6 +3583,34 @@ a[href*="spline"],
 .ft-mail:hover { border-color: rgba(211, 56, 43, 0.8); }
 .ft-mail:hover .ft-mail-arrow { transform: translateX(6px); }
 
+.ft-mail-wrapper {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.ft-mail-copied-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(211, 56, 43, 0.14);
+  border: 1px solid rgba(211, 56, 43, 0.45);
+  color: #ff7e70;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: clamp(26px, 5svh, 54px);
+  animation: ftFadeIn 0.3s ease-out;
+}
+
+@keyframes ftFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* --- link columns ------------------------------------------------ */
 .ft-cols {
   display: flex;
